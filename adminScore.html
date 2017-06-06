@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="UTF-8">
+	<title>成绩系统管理</title>
+    <!-- 
+	<script src="http://cdn.bootcss.com/vue/2.1.8/vue.js"></script>
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+     --><!--
+     <script src="js/jquery.min.js">
+	</script>
+	<script src="js/bootstrap.min.js">
+	</script>
+	<link href="js/bootstrap.min.css" rel="stylesheet" type="text/css"> 
+     -->
+     <script src="https://d3js.org/d3.v3.js"></script>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jqueryui/1.10.4/css/jquery-ui.min.css">
+    <script src="http://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://apps.bdimg.com/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<link href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <!-- // <script src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.min.js"></script> -->
+    
+    <style>
+        body{
+            background: #555;
+            background: #fff;
+        }
+        #selfInfoPanel{
+            width: 300px;
+        }
+        .shuli{ margin:0 auto;font-size: 25px;width:30px;line-height:30px;color:#2ec7c9;}
+        .shuli22{font-size: 45px;color:orange;}
+        .selectBar input{
+            width: 120px;
+        } 
+        .inline{
+            display: inline;
+        }
+        @media print{
+            .noprint{
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div id="test">
+</div>
+<div id="selfInfoPanel noprint">
+</div>
+<div id="selectBar" class="row panel panel-default noprint"　>
+    <div id="" class="panel-heading" class=" col-md-2" style="font-size: 20px;color:gray;">
+        　筛选
+    </div>
+
+    <div id="" class="  col-md-4" >
+            <br>
+            姓名
+            <input type='text' id='nameInput' class="form-control" placeholder="姓名" style="width: ;display:">
+    </div>
+    <div id="" class="  col-md-4" >
+            <br>
+            学号
+            <input type='text' id='idInput' class="form-control" placeholder="学号" style="width: ;display:">
+    </div>
+    <div id="" class="  col-md-4" >
+            <br>
+            班级
+            <input type='text' id='classsInput' class="form-control" placeholder="班级" style="width: ;display:">
+    </div>
+    <div class="  col-md-4" >
+            <br>
+        <div id=""  >
+                是否有未通过科目
+                <div id="passInput"></div>
+        </div>
+    </div>
+    <div id="" class="  col-md-4" >
+            <br>
+            GPA高于
+            <input type='number' id='gpagtInput' class="form-control" placeholder="GPA" style="width: ;display:">
+    </div>
+    <div id="" class="  col-md-4" >
+            <br>
+            GPA低于
+            <input type='number' id='gpaltInput' class="form-control" placeholder="GPA" style="width: ;display:">
+    </div>
+</div>
+<div class='noprint text-right'>
+    <a href="" id="downXls">
+    <button  class="btn btn-info"  
+    style="display:inline">下载为xls</button>
+    </a>
+    <button id="printTable" class="btn btn-info" onclick="print()" style="display:inline">打印</button>
+    <br>
+    <br>
+</div>
+<div id='student-panel'>
+    <table id="stuTable" class="table-striped table  table-hover table-bordered" width="80%">
+            <caption>各科成绩</caption>
+
+        
+    </table>
+</div>
+
+<!-- 隐藏模态框 -->
+<!-- 用法：setModal(modalDivId,f)
+div$('#modalDivId')的modalTitle属性为model的标题
+div中的内容将会append到model的body中
+提交后 执行f
+测试代码：setModal('modalTest',()=>log($('#modalTestVal').val()))
+-->
+<div id="hiddenModals" class="hidden">
+    <div id ='modalTest' modalTitle='modalTest的标题'>
+        <input id="modalTestVal">
+    </div>
+
+    <div id ='evalateInputPanel' modalTitle='请评价此课程'>
+        <br>
+        <span class="">评分</span>
+        <select id="evalateScore" style="color:orange">
+            <option >★</option>
+            <option >★★</option>
+            <option >★★★</option>
+            <option >★★★★</option>
+            <option >★★★★★</option>
+        </select>
+        <br>
+        <br>
+        <div class="form-group">
+            <label for="name">评价<small>(140字以内)</small></label>
+            <textarea id="evalateString" class="form-control" rows="3"></textarea>
+        </div>
+
+    </div>
+</div>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    请对课程进行评价
+                </h4>
+            </div>
+            <div class="modal-body">
+                在这里添加一些文本
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                </button>
+                <button type="button" class="btn btn-primary" onclick="javascript:modalTmp.f()">
+                    提交更改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+</body>
+<!-- <script src="./js/leiYangFuns.js"></script>
+<script src="./js/publicFun.js"></script>
+<script src="./js/studentScore.js"></script> -->
+<script>
+var jsCssRequest = [
+    "./js/leiYangFuns.js",
+    "./js/publicFun.js",
+    "./js/adminScore.js",
+    ]
+function setJsCssRequest (x) {
+    var js = document.createElement( "script" )
+    js.src = x + '?' + Math.random()
+    document.body.appendChild(js)
+}
+jsCssRequest.map(setJsCssRequest)
+
+</script>
+</html>
